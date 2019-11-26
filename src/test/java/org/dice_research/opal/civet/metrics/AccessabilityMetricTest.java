@@ -24,7 +24,6 @@ public class AccessabilityMetricTest {
 	private static final String TEST_EDP_ICE_DATASET = "http://projekt-opal.de/distribution/https___europeandataportal_eu_set_distribution_aaa86820_459c_4636_9cc4_5c55236fc898";
 	
 	
-	
 	@Before
 	public void setUp() throws Exception {
 		testdata = new TestData();

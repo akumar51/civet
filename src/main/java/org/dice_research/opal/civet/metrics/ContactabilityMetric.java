@@ -2,9 +2,16 @@ package org.dice_research.opal.civet.metrics;
 
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.NodeIterator;
+import org.apache.jena.rdf.model.RDFNode;
 import org.apache.jena.rdf.model.Resource;
 import org.apache.jena.rdf.model.ResourceFactory;
+import org.apache.jena.rdf.model.SimpleSelector;
+import org.apache.jena.rdf.model.Statement;
+import org.apache.jena.rdf.model.StmtIterator;
 import org.apache.jena.vocabulary.DCAT;
+import org.apache.jena.vocabulary.DCTerms;
+import org.apache.jena.vocabulary.RDF;
+import org.apache.jena.vocabulary.VCARD;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.dice_research.opal.civet.Metric;
@@ -28,28 +35,73 @@ public class ContactabilityMetric implements Metric {
 
 		LOGGER.info("Processing dataset " + datasetUri);
 
-		//	Resource dataset = ResourceFactory.createResource(datasetUri);
+		//Resource dataset = ResourceFactory.createResource(datasetUri);
 		Resource distribution = ResourceFactory.createResource(datasetUri);
 
-		NodeIterator nodeIterator = model.listObjectsOfProperty(distribution, DCAT.contactPoint);
+//		NodeIterator nodeIterator = model.listObjectsOfProperty(distribution, DCAT.contactPoint);
+		
+//		Statement statement = model.getProperty(distribution, DCAT.contactPoint);
+		StmtIterator IteratorOverPublisher = model
+				.listStatements(new SimpleSelector(null, DCAT.contactPoint, (RDFNode) null));
+		int result = 0;
+		System.out.println("Success1");
 
-		int numberOfKeywords = 0;
-		while (nodeIterator.hasNext()) {
-			numberOfKeywords++;
-			nodeIterator.next();
-		}
 
-		if (numberOfKeywords <= 0) {
-			// No keywords used
-			return 0;
-		} else if (numberOfKeywords <= 1) {
-			// Keywords used
-			return 4;
-		} else {
-			// More than 1 keyword: Indicator for extensive use
-			return 5;
+		if (IteratorOverPublisher.hasNext()) {
+			System.out.println("Success2");
+
+
+			while (IteratorOverPublisher.hasNext()) {
+				System.out.println("Success while");
+
+
+				Statement StatementWithPublisher = IteratorOverPublisher.nextStatement();
+				RDFNode Publisher = StatementWithPublisher.getObject();
+				
+				if (Publisher.isAnon()) {
+					System.out.println("Success is anon");
+
+					Resource PublisherBlankNode = (Resource) Publisher;
+					
+					if ((PublisherBlankNode.hasProperty(RDF.type, VCARD.NAME)))
+						 {
+						
+//						&&(PublisherBlankNode.hasProperty(RDF.type, VCARD.EMAIL))
+						System.out.println("vcard found");
+
+						result++;
+						
+						System.out.println(result);
+
+					}
+					
+					}
+						
+			}}
+//
+//	//	
+////		String accessUrl = "";
+////			if(statement != null)
+////				accessUrl = String.valueOf(statement.getObject());
+//		RDFNode Publisher = statement.getObject();
+//
+//			System.out.println("Success1");
+//
+//		
+//			Resource PublisherBlankNode = (Resource) Publisher;
+//			System.out.println("Success2");
+//
+//			if (PublisherBlankNode.hasProperty(RDF.type, VCARD.NAME)) {
+//				result=5;
+//				System.out.println("Success3");
+//			}
+//			
+//			
+//	
+//		
+		return result;
 		}
-	}
+	
 
 	@Override
 	public String getDescription() {
@@ -62,3 +114,25 @@ public class ContactabilityMetric implements Metric {
 	}
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
