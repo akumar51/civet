@@ -26,83 +26,78 @@ import org.dice_research.opal.common.vocabulary.Opal;
 public class ContactabilityMetric implements Metric {
 
 	private static final Logger LOGGER = LogManager.getLogger();
-	private static final String DESCRIPTION = "Computes the number of keywords. "
-			+ "If exactly one keyword is given, 4 stars are awarded. "
-			+ "If more than one keyword is given, 5 stars are awarded.";
+	private static final String DESCRIPTION = "Computes the quality of dataset as per contactability metric." 
+			+ "Four kinds of ratings are awarded to the dataset which are following: "
+			+ "Rating 5: Name, Email and Address is in the dataset."
+			+ "Rating 4: If any two of the Name, Email and Address is in the dataset."
+			+ "Rating 2: If any one of the Name, Email and Address is in the dataset."
+			+ "Rating 0: If none of the Name, Email and Address is in the dataset.";
 
 	@Override
 	public Integer compute(Model model, String datasetUri) throws Exception {
-
+		//creating a dataset
 		LOGGER.info("Processing dataset " + datasetUri);
-
-		//Resource dataset = ResourceFactory.createResource(datasetUri);
-		Resource distribution = ResourceFactory.createResource(datasetUri);
-
-//		NodeIterator nodeIterator = model.listObjectsOfProperty(distribution, DCAT.contactPoint);
-		
-//		Statement statement = model.getProperty(distribution, DCAT.contactPoint);
-		StmtIterator IteratorOverPublisher = model
-				.listStatements(new SimpleSelector(null, DCAT.contactPoint, (RDFNode) null));
 		int result = 0;
-		System.out.println("Success1");
+		Resource distribution = ResourceFactory.createResource(datasetUri);
+		
+		StmtIterator stmtItr = model.listStatements(new SimpleSelector
+				(distribution,DCAT.contactPoint,(RDFNode) null)
+//				{
+//                    @Override
+//                    public boolean selects(Statement s) {
+//                            return s.getString().contentEquals("Татяна Стоянова");
+//                    }
+//				}
+				);
+		
+		boolean nameFound=false;
+		boolean emailFound=false;
+		boolean adrFound=false;
 
-
-		if (IteratorOverPublisher.hasNext()) {
-			System.out.println("Success2");
-
-
-			while (IteratorOverPublisher.hasNext()) {
-				System.out.println("Success while");
-
-
-				Statement StatementWithPublisher = IteratorOverPublisher.nextStatement();
-				RDFNode Publisher = StatementWithPublisher.getObject();
-				
-				if (Publisher.isAnon()) {
-					System.out.println("Success is anon");
-
-					Resource PublisherBlankNode = (Resource) Publisher;
-					
-					if ((PublisherBlankNode.hasProperty(RDF.type, VCARD.NAME)))
-						 {
-						
-//						&&(PublisherBlankNode.hasProperty(RDF.type, VCARD.EMAIL))
-						System.out.println("vcard found");
-
-						result++;
-						
-						System.out.println(result);
-
-					}
-					
-					}
-						
-			}}
-//
-//	//	
-////		String accessUrl = "";
-////			if(statement != null)
-////				accessUrl = String.valueOf(statement.getObject());
-//		RDFNode Publisher = statement.getObject();
-//
-//			System.out.println("Success1");
-//
-//		
-//			Resource PublisherBlankNode = (Resource) Publisher;
-//			System.out.println("Success2");
-//
-//			if (PublisherBlankNode.hasProperty(RDF.type, VCARD.NAME)) {
-//				result=5;
-//				System.out.println("Success3");
-//			}
-//			
-//			
-//	
-//		
-		return result;
+		if(stmtItr.hasNext())
+		{
+			Statement stmt = stmtItr.nextStatement();
+			RDFNode object = stmt.getObject();
+			Resource objectAsResource = (Resource) object ;
+			if(objectAsResource.hasProperty(VCARD.EMAIL))
+			{
+                String email = objectAsResource.getProperty
+                        (VCARD.EMAIL).getObject().toString();
+                if(!email.equals(""))
+                {
+					emailFound =  true ;
+                }
+			}
+			if(objectAsResource.hasProperty(VCARD.NAME))
+			{
+                String name = objectAsResource.getProperty
+                        (VCARD.NAME).getObject().toString();
+                if(!name.equals(""))
+                {
+					nameFound =  true ;
+                }
+			}
+			if(objectAsResource.hasProperty(VCARD.ADR))
+			{
+                String adr = objectAsResource.getProperty
+                        (VCARD.ADR).getObject().toString();
+                if(!adr.equals(""))
+                {
+					adrFound =  true ;
+                }
+			}
+		}
+		
+		if(nameFound && emailFound && adrFound)
+			return 5;
+		else if((nameFound && emailFound)||(nameFound && adrFound)||(emailFound && adrFound))
+			return 4;
+		else if(nameFound || emailFound || adrFound )
+			return 2;
+		else 
+			return 0;
 		}
 	
-
 	@Override
 	public String getDescription() {
 		return DESCRIPTION;
@@ -112,27 +107,7 @@ public class ContactabilityMetric implements Metric {
 	public String getUri() throws Exception {
 		return Opal.OPAL_METRIC_CATEGORIZATION.getURI();
 	}
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

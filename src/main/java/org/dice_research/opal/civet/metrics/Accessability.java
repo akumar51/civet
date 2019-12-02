@@ -1,3 +1,4 @@
+
 package org.dice_research.opal.civet.metrics;
 
 import java.net.HttpURLConnection;
@@ -24,24 +25,17 @@ import org.dice_research.opal.common.vocabulary.Opal;
 public class Accessability implements Metric {
 
 	private static final Logger LOGGER = LogManager.getLogger();
-	private static final String DESCRIPTION = "Computes the number of keywords. "
-			+ "If exactly one keyword is given, 4 stars are awarded. "
-			+ "If more than one keyword is given, 5 stars are awarded.";
+	private static final String DESCRIPTION = "Computes the quality of dataset as per accessability metric.\n" + 
+			"Two kinds of ratings are awarded to the dataset which are following: \"\n" + 
+			"Rating 5: If the connection is successfull\n" + 
+			"Rating 0: If the connection is not successfull.\"\n";
 
 	@Override
 	public Integer compute(Model model, String datasetUri) throws Exception {
 
 		LOGGER.info("Processing dataset " + datasetUri);
-
-		//	Resource dataset = ResourceFactory.createResource(datasetUri);
 		Resource distribution = ResourceFactory.createResource(datasetUri);
-
-//		NodeIterator nodeIterator = model.listObjectsOfProperty(distribution, DCAT.contactPoint);
-		
 		Statement statement = model.getProperty(distribution, DCAT.accessURL);
-
-
-		
 		String accessUrl = "";
  		if(statement != null)
  			accessUrl = String.valueOf(statement.getObject());
@@ -59,14 +53,11 @@ public class Accessability implements Metric {
 			if (code == 200) {
 				result = 5;
 			}
-		} catch (Exception e) {
-			
-
+		} 
+		catch (Exception e) {
 			result = 0;
 		}
-		
 		return result;
-		
 	}
 
 	@Override

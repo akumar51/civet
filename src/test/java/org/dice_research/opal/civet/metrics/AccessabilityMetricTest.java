@@ -21,7 +21,7 @@ public class AccessabilityMetricTest {
 	TestData testdata;
 
 	private static final String TEST_EDP_ICE = "model4881.ttl";
-	private static final String TEST_EDP_ICE_DATASET = "http://projekt-opal.de/distribution/https___europeandataportal_eu_set_distribution_aaa86820_459c_4636_9cc4_5c55236fc898";
+	private static final String TEST_EDP_ICE_DATASET = "http://projekt-opal.de/distribution/https___europeandataportal_eu_set_distribution_85534826_c59f_458a_a576_2ce11eedf76d";
 	
 	
 	@Before
@@ -59,12 +59,8 @@ public class AccessabilityMetricTest {
 		// Compute stars
 		Accessability metric = new Accessability();
 		Integer stars = metric.compute(testdata.getModel(TEST_EDP_ICE), TEST_EDP_ICE_DATASET);
-
-		// Keywords in test dataset:
-		// "Iceland" , "Downloadable Data" , "land use" , "land cover"
-		// Should result in 5 stars
-//		Assert.assertEquals(TEST_EDP_ICE, 5, stars.intValue());
 		Assert.assertEquals(TEST_EDP_ICE, 5, stars.intValue());
 	}
+	//to do test cases
 
 }
